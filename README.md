@@ -7,6 +7,9 @@
 - Start development environment with logs: `make start-env-debug`
 - Stop development environment: `make stop-env`
 
+- Show graph: `npx nx graph`
+- Show graph affected: `npx nx graph --affected`
+
 ## Local development
 - Setup env config
   - Copy `.env.sample` into `.env`
