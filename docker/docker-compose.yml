@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_ROOT_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_ROOT_USER}
+      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_DB_AUTH}
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    volumes:
+      - ./tmp/postgresql:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
