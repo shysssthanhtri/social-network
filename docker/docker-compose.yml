@@ -1,16 +1,33 @@
 version: '3.9'
 services:
-  postgresql:
-    container_name: postgresql
-    image: postgres:alpine
+  # postgresql:
+  #   container_name: social_postgresql
+  #   image: postgres:alpine
+  #   environment:
+  #     - POSTGRES_USER=${POSTGRES_ROOT_USER}
+  #     - POSTGRES_PASSWORD=${POSTGRES_ROOT_USER}
+  #     - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_DB_AUTH}
+  #   ports:
+  #     - 5432:5432
+  #   expose:
+  #     - 5432
+  #   volumes:
+  #     - ./tmp/postgresql:/var/lib/postgresql/data
+  #     - ./scripts/postgresql:/docker-entrypoint-initdb.d
+
+  mongo:
+    container_name: social_mongo
+    image: mongo
     environment:
-      - POSTGRES_USER=${POSTGRES_ROOT_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_ROOT_USER}
-      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_DB_AUTH}
-    ports:
-      - 5432:5432
-    expose:
-      - 5432
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_AUTH_DATABASE=${MONGO_AUTH_DATABASE}
+      - MONGO_AUTH_USERNAME=${MONGO_AUTH_USERNAME}
+      - MONGO_AUTH_PASSWORD=${MONGO_AUTH_PASSWORD}
     volumes:
-      - ./tmp/postgresql:/var/lib/postgresql/data
-      - ./scripts:/docker-entrypoint-initdb.d
+      - ./tmp/mongo:/data/db
+      - ./scripts/mongo:/docker-entrypoint-initdb.d
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
