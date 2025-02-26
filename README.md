@@ -10,6 +10,8 @@
 - Show graph: `npx nx graph`
 - Show graph affected: `npx nx graph --affected`
 
+- Run lint for affected packages: `npx nx affected -t lint`
+
 ## Local development
 - Setup env config
   - Copy `.env.sample` into `.env`
