@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { UserEntity } from '@/domain/entities/user.entity';
 import { SignJwtService } from '@/domain/services/sign-jwt.service';
-import { JwtPayload } from '@/domain/types/jwt-payload';
+import { TJwtPayload } from '@/domain/types/jwt-payload';
 
 @Injectable()
 export class SignJwtServiceImpl extends SignJwtService {
@@ -18,7 +18,7 @@ export class SignJwtServiceImpl extends SignJwtService {
     signAccessToken(
         user: Pick<UserEntity, 'id' | 'passwordVersion' | 'email'>,
     ): Promise<string> {
-        const payload: JwtPayload = {
+        const payload: TJwtPayload = {
             id: user.id,
             email: user.email,
             passwordVersion: user.passwordVersion,
@@ -29,7 +29,7 @@ export class SignJwtServiceImpl extends SignJwtService {
     signRefreshToken(
         user: Pick<UserEntity, 'id' | 'passwordVersion' | 'email'>,
     ): Promise<string> {
-        const payload: JwtPayload = {
+        const payload: TJwtPayload = {
             id: user.id,
             email: user.email,
             passwordVersion: user.passwordVersion,

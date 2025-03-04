@@ -1,12 +1,12 @@
 import { UserEntity } from '@/domain/entities/user.entity';
 
-export type JwtPayload = {
+export type TJwtPayload = {
     id: UserEntity['id'];
     email: UserEntity['email'];
     passwordVersion: UserEntity['passwordVersion'];
 };
 
-export type RefreshJwtPayload = {
+export type TRefreshJwtPayload = {
     id: UserEntity['id'];
     email: UserEntity['email'];
     passwordVersion: UserEntity['passwordVersion'];

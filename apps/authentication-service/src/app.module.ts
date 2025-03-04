@@ -14,6 +14,7 @@ import { UserRepoImpl } from '@/frameworks/repo/user.repo.impl';
 import { UserSchema } from '@/frameworks/schemas/user.schema';
 import { HashPasswordServiceImpl } from '@/frameworks/services/hash-password.service.impl';
 import { SignJwtServiceImpl } from '@/frameworks/services/sign-jwt.service.imp';
+import { JwtStrategy } from '@/frameworks/strategies/jwt.strategy';
 import { AuthController } from '@/gateways/controllers/auth.controller';
 
 import { AppController } from './app.controller';
@@ -55,6 +56,9 @@ import { AppService } from './app.service';
     controllers: [AppController, AuthController],
     providers: [
         AppService,
+
+        //  STRATEGIES
+        JwtStrategy,
 
         //  USE CASES
         SignUpUseCase,

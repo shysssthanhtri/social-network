@@ -1,20 +1,26 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
+    ApiBearerAuth,
     ApiConflictResponse,
     ApiCreatedResponse,
+    ApiOkResponse,
     ApiOperation,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { TJwtPayload } from '@/domain/types/jwt-payload';
 import { LoginReqDto } from '@/domain/use-cases/login/dtos/login.req.dto';
 import { LoginResDto } from '@/domain/use-cases/login/dtos/login.res.dto';
 import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
 import { SignUpReqDto } from '@/domain/use-cases/sign-up/dtos/sign-up.req.dto';
 import { SignUpResDto } from '@/domain/use-cases/sign-up/dtos/sign-up.res.dto';
 import { SignUpUseCase } from '@/domain/use-cases/sign-up/sign-up.use-case';
+import { JwtPayload } from '@/frameworks/decorators/jwt-payload.decorator';
+import { JwtGuard } from '@/frameworks/guards/jwt.guard';
 import { BadRequestDto } from '@/gateways/dtos/bad-request.dto';
 import { CommonExceptionDto } from '@/gateways/dtos/common-exception.dto';
+import { CurrentUserResDto } from '@/gateways/dtos/current-user.res.dto';
 
 @Controller()
 export class AuthController {
@@ -42,6 +48,7 @@ export class AuthController {
         type: CommonExceptionDto,
     })
     signUp(@Body() dto: SignUpReqDto) {
+        console.log('Hello');
         return this.signUpUseCase.execute(dto);
     }
 
@@ -65,5 +72,24 @@ export class AuthController {
     })
     login(@Body() dto: LoginReqDto) {
         return this.loginUseCase.execute(dto);
+    }
+
+    @Get('whoiam')
+    @UseGuards(JwtGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get current user information',
+        description: 'From access token, get user information',
+    })
+    @ApiOkResponse({
+        description: 'Current user information',
+        type: CurrentUserResDto,
+    })
+    @ApiUnauthorizedResponse({
+        description: 'You are unauthorized',
+        type: CommonExceptionDto,
+    })
+    whoIAm(@JwtPayload() jwtPayload: TJwtPayload) {
+        return new CurrentUserResDto(jwtPayload.id, jwtPayload.email);
     }
 }
