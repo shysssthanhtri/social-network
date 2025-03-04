@@ -25,4 +25,9 @@ export class UserRepoImpl extends UserRepo {
         const user = await this.userModel.exists({ email }).exec();
         return !!user;
     }
+
+    async findByEmail(email: UserEntity['email']): Promise<UserEntity | null> {
+        const user = await this.userModel.findOne({ email }).exec();
+        return user;
+    }
 }

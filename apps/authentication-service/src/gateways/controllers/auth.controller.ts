@@ -4,19 +4,26 @@ import {
     ApiConflictResponse,
     ApiCreatedResponse,
     ApiOperation,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { LoginReqDto } from '@/domain/use-cases/login/dtos/login.req.dto';
+import { LoginResDto } from '@/domain/use-cases/login/dtos/login.res.dto';
+import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
 import { SignUpReqDto } from '@/domain/use-cases/sign-up/dtos/sign-up.req.dto';
 import { SignUpResDto } from '@/domain/use-cases/sign-up/dtos/sign-up.res.dto';
 import { SignUpUseCase } from '@/domain/use-cases/sign-up/sign-up.use-case';
 import { BadRequestDto } from '@/gateways/dtos/bad-request.dto';
-import { ConflictDto } from '@/gateways/dtos/conflict.dto';
+import { CommonExceptionDto } from '@/gateways/dtos/common-exception.dto';
 
 @Controller()
 export class AuthController {
-    constructor(private readonly signUpUseCase: SignUpUseCase) {}
+    constructor(
+        private readonly signUpUseCase: SignUpUseCase,
+        private readonly loginUseCase: LoginUseCase,
+    ) {}
 
-    @Post()
+    @Post('signup')
     @ApiOperation({
         summary: 'Sign up new account',
         description:
@@ -32,9 +39,31 @@ export class AuthController {
     })
     @ApiConflictResponse({
         description: 'Email is existed',
-        type: ConflictDto,
+        type: CommonExceptionDto,
     })
     signUp(@Body() dto: SignUpReqDto) {
         return this.signUpUseCase.execute(dto);
+    }
+
+    @Post('login')
+    @ApiOperation({
+        summary: 'Login with email and password',
+        description:
+            'Login with email and password, return authentication credentials',
+    })
+    @ApiCreatedResponse({
+        description: 'Credentials are returned',
+        type: LoginResDto,
+    })
+    @ApiBadRequestResponse({
+        description: 'Failed request validation',
+        type: BadRequestDto,
+    })
+    @ApiUnauthorizedResponse({
+        description: 'Your credentials are incorrect',
+        type: CommonExceptionDto,
+    })
+    login(@Body() dto: LoginReqDto) {
+        return this.loginUseCase.execute(dto);
     }
 }

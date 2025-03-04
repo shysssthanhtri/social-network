@@ -8,6 +8,7 @@ import { UserEntity } from '@/domain/entities/user.entity';
 import { UserRepo } from '@/domain/repo/user.repo';
 import { HashPasswordService } from '@/domain/services/hash-password.service';
 import { SignJwtService } from '@/domain/services/sign-jwt.service';
+import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
 import { SignUpUseCase } from '@/domain/use-cases/sign-up/sign-up.use-case';
 import { UserRepoImpl } from '@/frameworks/repo/user.repo.impl';
 import { UserSchema } from '@/frameworks/schemas/user.schema';
@@ -57,6 +58,7 @@ import { AppService } from './app.service';
 
         //  USE CASES
         SignUpUseCase,
+        LoginUseCase,
 
         //  REPO
         { provide: UserRepo, useClass: UserRepoImpl },
