@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -18,16 +19,25 @@ import { AppService } from './app.service';
 
 @Module({
     imports: [
-        MongooseModule.forRoot(
-            'mongodb://auth-admin:auth-admin@localhost:27017/auth',
-        ),
+        ConfigModule.forRoot({ isGlobal: true }),
+        MongooseModule.forRootAsync({
+            useFactory: (configService: ConfigService) => {
+                return {
+                    uri: configService.getOrThrow('AUTH_DATABASE_URL'),
+                };
+            },
+            inject: [ConfigService],
+        }),
         MongooseModule.forFeature([
             { name: UserEntity.name, schema: UserSchema },
         ]),
-        JwtModule.register({
+        JwtModule.registerAsync({
             global: true,
-            secret: 'access_token_secret',
-            signOptions: { expiresIn: '60m' },
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.getOrThrow('AUTH_ACCESS_TOKEN_SECRET'),
+                signOptions: { expiresIn: '60m' },
+            }),
+            inject: [ConfigService],
         }),
     ],
     controllers: [AppController, AuthController],

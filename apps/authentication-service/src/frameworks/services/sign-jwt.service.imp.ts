@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserEntity } from '@/domain/entities/user.entity';
@@ -7,7 +8,10 @@ import { JwtPayload } from '@/domain/types/jwt-payload';
 
 @Injectable()
 export class SignJwtServiceImpl extends SignJwtService {
-    constructor(private readonly jwtService: JwtService) {
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService,
+    ) {
         super();
     }
 
@@ -31,7 +35,7 @@ export class SignJwtServiceImpl extends SignJwtService {
             passwordVersion: user.passwordVersion,
         };
         return this.jwtService.signAsync(payload, {
-            secret: 'refresh-token-secret',
+            secret: this.configService.getOrThrow('AUTH_ACCESS_REFRESH_SECRET'),
         });
     }
 }
