@@ -10,6 +10,7 @@ import { HashPasswordService } from '@/domain/services/hash-password.service';
 import { SignJwtService } from '@/domain/services/sign-jwt.service';
 import { ChangePasswordUseCase } from '@/domain/use-cases/change-password/change-password.use-case';
 import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
+import { RefreshTokenUseCase } from '@/domain/use-cases/refresh-token/refresh-token.use-case';
 import { SignUpUseCase } from '@/domain/use-cases/sign-up/sign-up.use-case';
 import { UserRepoImpl } from '@/frameworks/repo/user.repo.impl';
 import { UserSchema } from '@/frameworks/schemas/user.schema';
@@ -65,6 +66,7 @@ import { AppService } from './app.service';
         SignUpUseCase,
         LoginUseCase,
         ChangePasswordUseCase,
+        RefreshTokenUseCase,
 
         //  REPO
         { provide: UserRepo, useClass: UserRepoImpl },

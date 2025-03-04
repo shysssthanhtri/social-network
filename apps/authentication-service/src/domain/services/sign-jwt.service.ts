@@ -1,4 +1,5 @@
 import { UserEntity } from '@/domain/entities/user.entity';
+import { TRefreshJwtPayload } from '@/domain/types/jwt-payload';
 
 export abstract class SignJwtService {
     abstract signAccessToken(
@@ -8,4 +9,6 @@ export abstract class SignJwtService {
     abstract signRefreshToken(
         user: Pick<UserEntity, 'id' | 'passwordVersion'>,
     ): Promise<string>;
+
+    abstract parseRefreshToken(token: string): Promise<TRefreshJwtPayload>;
 }

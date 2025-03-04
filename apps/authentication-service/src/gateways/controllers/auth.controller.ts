@@ -16,6 +16,9 @@ import { ChangePasswordResDto } from '@/domain/use-cases/change-password/dtos/ch
 import { LoginReqDto } from '@/domain/use-cases/login/dtos/login.req.dto';
 import { LoginResDto } from '@/domain/use-cases/login/dtos/login.res.dto';
 import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
+import { RefreshTokenReqDto } from '@/domain/use-cases/refresh-token/dtos/refresh-token.req.dto';
+import { RefreshTokenResDto } from '@/domain/use-cases/refresh-token/dtos/refresh-token.res.dto';
+import { RefreshTokenUseCase } from '@/domain/use-cases/refresh-token/refresh-token.use-case';
 import { SignUpReqDto } from '@/domain/use-cases/sign-up/dtos/sign-up.req.dto';
 import { SignUpResDto } from '@/domain/use-cases/sign-up/dtos/sign-up.res.dto';
 import { SignUpUseCase } from '@/domain/use-cases/sign-up/sign-up.use-case';
@@ -31,6 +34,7 @@ export class AuthController {
         private readonly signUpUseCase: SignUpUseCase,
         private readonly loginUseCase: LoginUseCase,
         private readonly changePasswordUseCase: ChangePasswordUseCase,
+        private readonly refreshTokenUseCase: RefreshTokenUseCase,
     ) {}
 
     @Post('signup')
@@ -97,7 +101,7 @@ export class AuthController {
         return new CurrentUserResDto(jwtPayload.id, jwtPayload.email);
     }
 
-    @Put()
+    @Put('change-password')
     @UseGuards(JwtGuard)
     @ApiBearerAuth()
     @ApiOperation({
@@ -118,5 +122,22 @@ export class AuthController {
         @JwtPayload() jwtPayload: TJwtPayload,
     ) {
         return this.changePasswordUseCase.execute(jwtPayload.id, dto);
+    }
+
+    @Put('refresh-token')
+    @ApiOperation({
+        summary: 'Get new token with refresh token.',
+        description: 'Get new token with refresh token.',
+    })
+    @ApiOkResponse({
+        description: 'Your new tokens',
+        type: RefreshTokenResDto,
+    })
+    @ApiBadRequestResponse({
+        description: 'Failed request validation',
+        type: BadRequestDto,
+    })
+    refreshToken(@Body() dto: RefreshTokenReqDto) {
+        return this.refreshTokenUseCase.execute(dto);
     }
 }
