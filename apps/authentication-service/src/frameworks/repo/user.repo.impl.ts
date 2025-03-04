@@ -14,11 +14,11 @@ export class UserRepoImpl extends UserRepo {
         super();
     }
 
-    add(
+    async add(
         user: Pick<UserEntity, 'email' | 'hashedPassword' | 'passwordVersion'>,
     ): Promise<UserEntity> {
         const createdUser = new this.userModel(user);
-        return createdUser.save();
+        return (await createdUser.save()).toJSON();
     }
 
     async isEmailExisted(email: UserEntity['email']): Promise<boolean> {
@@ -26,8 +26,10 @@ export class UserRepoImpl extends UserRepo {
         return !!user;
     }
 
-    async findByEmail(email: UserEntity['email']): Promise<UserEntity | null> {
+    async findByEmail(
+        email: UserEntity['email'],
+    ): Promise<UserEntity | undefined> {
         const user = await this.userModel.findOne({ email }).exec();
-        return user;
+        return user?.toJSON();
     }
 }

@@ -5,7 +5,7 @@ export abstract class UserRepo {
 
     abstract findByEmail(
         email: UserEntity['email'],
-    ): Promise<UserEntity | null>;
+    ): Promise<UserEntity | undefined>;
 
     abstract add(
         user: Pick<UserEntity, 'email' | 'hashedPassword' | 'passwordVersion'>,
