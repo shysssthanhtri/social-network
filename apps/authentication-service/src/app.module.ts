@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
+import { LoggerModule } from 'nestjs-pino';
 
 import { UserEntity } from '@/domain/entities/user.entity';
 import { UserRepo } from '@/domain/repo/user.repo';
@@ -20,6 +21,16 @@ import { AppService } from './app.service';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
+        LoggerModule.forRoot({
+            pinoHttp: {
+                name: 'add some name to every JSON line',
+                level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+                transport:
+                    process.env.NODE_ENV !== 'production'
+                        ? { target: 'pino-pretty' }
+                        : undefined,
+            },
+        }),
         MongooseModule.forRootAsync({
             useFactory: (configService: ConfigService) => {
                 return {
