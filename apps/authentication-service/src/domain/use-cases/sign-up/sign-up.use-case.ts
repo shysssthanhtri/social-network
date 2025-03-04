@@ -3,6 +3,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 import { UserRepo } from '@/domain/repo/user.repo';
+import { HashPasswordService } from '@/domain/services/hash-password.service';
 import { SignJwtService } from '@/domain/services/sign-jwt.service';
 import { SignUpReqDto } from '@/domain/use-cases/sign-up/dtos/sign-up.req.dto';
 import { SignUpResDto } from '@/domain/use-cases/sign-up/dtos/sign-up.res.dto';
@@ -16,6 +17,8 @@ export class SignUpUseCase {
         private readonly connection: Connection,
         @Inject(SignJwtService)
         private readonly signJwtService: SignJwtService,
+        @Inject(HashPasswordService)
+        private readonly hashPasswordService: HashPasswordService,
     ) {}
 
     async execute(dto: SignUpReqDto): Promise<SignUpResDto> {
@@ -27,16 +30,17 @@ export class SignUpUseCase {
                 dto.email,
             );
             if (isEmailDuplicated) {
-                throw new ConflictException();
+                throw new ConflictException('Email is existed');
             }
 
-            const hashedPassword = 'faked';
-            const passwordVersion = 1;
             const user = await this.userRepo.add({
                 email: dto.email,
-                hashedPassword,
-                passwordVersion,
+                hashedPassword: await this.hashPasswordService.hash(
+                    dto.password,
+                ),
+                passwordVersion: 1,
             });
+
             const resDto = new SignUpResDto(
                 await this.signJwtService.signAccessToken(user),
                 await this.signJwtService.signRefreshToken(user),
