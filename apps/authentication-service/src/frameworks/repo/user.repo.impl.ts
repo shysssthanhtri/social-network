@@ -20,4 +20,9 @@ export class UserRepoImpl extends UserRepo {
         const createdUser = new this.userModel(user);
         return createdUser.save();
     }
+
+    async isEmailExisted(email: UserEntity['email']): Promise<boolean> {
+        const user = await this.userModel.exists({ email }).exec();
+        return !!user;
+    }
 }

@@ -3,6 +3,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 import { UserRepo } from '@/domain/repo/user.repo';
+import { SignJwtService } from '@/domain/services/sign-jwt.service';
 import { SignUpReqDto } from '@/domain/use-cases/sign-up/dtos/sign-up.req.dto';
 import { SignUpResDto } from '@/domain/use-cases/sign-up/dtos/sign-up.res.dto';
 
@@ -13,6 +14,8 @@ export class SignUpUseCase {
         private readonly userRepo: UserRepo,
         @InjectConnection()
         private readonly connection: Connection,
+        @Inject(SignJwtService)
+        private readonly signJwtService: SignJwtService,
     ) {}
 
     async execute(dto: SignUpReqDto): Promise<SignUpResDto> {
@@ -20,9 +23,9 @@ export class SignUpUseCase {
         session.startTransaction();
 
         try {
-            const isEmailDuplicated = !!(await this.userRepo.findByEmail(
+            const isEmailDuplicated = await this.userRepo.isEmailExisted(
                 dto.email,
-            ));
+            );
             if (isEmailDuplicated) {
                 throw new ConflictException();
             }
@@ -34,13 +37,13 @@ export class SignUpUseCase {
                 hashedPassword,
                 passwordVersion,
             });
-            console.log(user);
+            const resDto = new SignUpResDto(
+                await this.signJwtService.signAccessToken(user),
+                await this.signJwtService.signRefreshToken(user),
+            );
 
             await session.commitTransaction();
-            return {
-                accessToken: '',
-                refreshToken: '',
-            };
+            return resDto;
         } catch (err) {
             await session.abortTransaction();
             throw err;
