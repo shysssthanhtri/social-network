@@ -7,7 +7,13 @@ export abstract class UserRepo {
         email: UserEntity['email'],
     ): Promise<UserEntity | undefined>;
 
+    abstract findById(id: UserEntity['id']): Promise<UserEntity | undefined>;
+
+    abstract getById(id: UserEntity['id']): Promise<UserEntity>;
+
     abstract add(
         user: Pick<UserEntity, 'email' | 'hashedPassword' | 'passwordVersion'>,
     ): Promise<UserEntity>;
+
+    abstract save(user: UserEntity): Promise<UserEntity>;
 }

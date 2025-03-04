@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
@@ -10,6 +10,9 @@ import {
 } from '@nestjs/swagger';
 
 import { TJwtPayload } from '@/domain/types/jwt-payload';
+import { ChangePasswordUseCase } from '@/domain/use-cases/change-password/change-password.use-case';
+import { ChangePasswordReqDto } from '@/domain/use-cases/change-password/dtos/change-password.req.dto';
+import { ChangePasswordResDto } from '@/domain/use-cases/change-password/dtos/change-password.res.dto';
 import { LoginReqDto } from '@/domain/use-cases/login/dtos/login.req.dto';
 import { LoginResDto } from '@/domain/use-cases/login/dtos/login.res.dto';
 import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
@@ -27,6 +30,7 @@ export class AuthController {
     constructor(
         private readonly signUpUseCase: SignUpUseCase,
         private readonly loginUseCase: LoginUseCase,
+        private readonly changePasswordUseCase: ChangePasswordUseCase,
     ) {}
 
     @Post('signup')
@@ -91,5 +95,28 @@ export class AuthController {
     })
     whoIAm(@JwtPayload() jwtPayload: TJwtPayload) {
         return new CurrentUserResDto(jwtPayload.id, jwtPayload.email);
+    }
+
+    @Put()
+    @UseGuards(JwtGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Change user password',
+        description:
+            'Change user password. Your previous token will be expired.',
+    })
+    @ApiOkResponse({
+        description: 'New credentials are returned',
+        type: ChangePasswordResDto,
+    })
+    @ApiUnauthorizedResponse({
+        description: 'You are unauthorized',
+        type: CommonExceptionDto,
+    })
+    changePassword(
+        @Body() dto: ChangePasswordReqDto,
+        @JwtPayload() jwtPayload: TJwtPayload,
+    ) {
+        return this.changePasswordUseCase.execute(jwtPayload.id, dto);
     }
 }
