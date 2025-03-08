@@ -56,7 +56,6 @@ export class AuthController {
         type: CommonExceptionDto,
     })
     signUp(@Body() dto: SignUpReqDto) {
-        console.log('Hello');
         return this.signUpUseCase.execute(dto);
     }
 

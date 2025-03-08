@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LoggerModule } from 'nestjs-pino';
+import { SignUpQueue } from 'rabbitmq-config';
 
 import { UserEntity } from '@/domain/entities/user.entity';
 import { UserRepo } from '@/domain/repo/user.repo';
@@ -54,6 +56,22 @@ import { AppService } from './app.service';
             }),
             inject: [ConfigService],
         }),
+        ClientsModule.registerAsync([
+            {
+                name: SignUpQueue.queue,
+                useFactory: (configService: ConfigService) => ({
+                    transport: Transport.RMQ,
+                    options: {
+                        url: configService.getOrThrow<string>('RABBITMQ_URL'),
+                        queue: SignUpQueue.queue,
+                        queueOptions: {
+                            durable: true,
+                        },
+                    },
+                }),
+                inject: [ConfigService],
+            },
+        ]),
     ],
     controllers: [AppController, AuthController],
     providers: [
