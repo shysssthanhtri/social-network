@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { SignUpEvent, SignUpQueue } from 'rabbitmq-config';
 
@@ -10,8 +10,6 @@ import { SignUpResDto } from '@/domain/use-cases/sign-up/dtos/sign-up.res.dto';
 
 @Injectable()
 export class SignUpUseCase {
-    private readonly logger = new Logger(SignUpUseCase.name);
-
     constructor(
         @Inject(UserRepo)
         private readonly userRepo: UserRepo,
