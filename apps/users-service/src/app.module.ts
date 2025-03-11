@@ -1,5 +1,8 @@
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import {
+    ApolloFederationDriver,
+    ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -21,10 +24,12 @@ import { AppService } from './app.service';
 @Module({
     imports: [
         CommonModule,
-        GraphQLModule.forRoot<ApolloDriverConfig>({
-            driver: ApolloDriver,
+        GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+            driver: ApolloFederationDriver,
+            autoSchemaFile: {
+                federation: 2,
+            },
             playground: false,
-            autoSchemaFile: true,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
         MongooseModule.forRootAsync({
