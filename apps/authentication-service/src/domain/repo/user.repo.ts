@@ -1,6 +1,8 @@
+import { BasedRepo } from 'nestjs-postgresql';
+
 import { UserEntity } from '@/domain/entities/user.entity';
 
-export abstract class UserRepo {
+export abstract class UserRepo extends BasedRepo {
     abstract isEmailExisted(email: UserEntity['email']): Promise<boolean>;
 
     abstract findByEmail(

@@ -1,33 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { DataSource } from 'typeorm';
 
 import { UserEntity } from '@/domain/entities/user.entity';
 import { UserRepo } from '@/domain/repo/user.repo';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UserRepoImpl extends UserRepo {
-    constructor(
-        @InjectRepository(UserEntity)
-        private readonly usersRepository: Repository<UserEntity>,
-    ) {
-        super();
+    constructor(dataSource: DataSource, @Inject(REQUEST) req: Request) {
+        super(dataSource, req);
     }
 
     async add(
         user: Pick<UserEntity, 'email' | 'hashedPassword' | 'passwordVersion'>,
     ): Promise<UserEntity> {
-        return this.usersRepository.save(user);
+        return this.getRepository(UserEntity).save(user);
     }
 
     async isEmailExisted(email: UserEntity['email']): Promise<boolean> {
-        return this.usersRepository.exists({ where: { email } });
+        return this.getRepository(UserEntity).exists({ where: { email } });
     }
 
     async findByEmail(
         email: UserEntity['email'],
     ): Promise<UserEntity | undefined> {
-        const user = await this.usersRepository.findOne({ where: { email } });
+        const user = await this.getRepository(UserEntity).findOne({
+            where: { email },
+        });
         return user ?? undefined;
     }
 
@@ -40,11 +39,13 @@ export class UserRepoImpl extends UserRepo {
     }
 
     async findById(id: UserEntity['id']): Promise<UserEntity | undefined> {
-        const user = await this.usersRepository.findOne({ where: { id } });
+        const user = await this.getRepository(UserEntity).findOne({
+            where: { id },
+        });
         return user ?? undefined;
     }
 
     async save(user: UserEntity): Promise<UserEntity> {
-        return this.usersRepository.save(user);
+        return this.getRepository(UserEntity).save(user);
     }
 }
