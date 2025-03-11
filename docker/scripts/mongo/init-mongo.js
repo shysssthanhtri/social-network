@@ -13,3 +13,10 @@ userDb.createUser({
   pwd: process.env.MONGO_USER_PASSWORD,
   roles: [{ role: 'readWrite', db: process.env.MONGO_USER_DATABASE }]
 });
+
+const friendDb = db.getSiblingDB(process.env.MONGO_FRIEND_DATABASE);
+friendDb.createUser({
+  user: process.env.MONGO_FRIEND_USERNAME,
+  pwd: process.env.MONGO_FRIEND_PASSWORD,
+  roles: [{ role: 'readWrite', db: process.env.MONGO_FRIEND_DATABASE }]
+});

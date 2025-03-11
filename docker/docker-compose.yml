@@ -27,6 +27,9 @@ services:
       - MONGO_USER_DATABASE=${MONGO_USER_DATABASE}
       - MONGO_USER_USERNAME=${MONGO_USER_USERNAME}
       - MONGO_USER_PASSWORD=${MONGO_USER_PASSWORD}
+      - MONGO_FRIEND_DATABASE=${MONGO_FRIEND_DATABASE}
+      - MONGO_FRIEND_USERNAME=${MONGO_FRIEND_USERNAME}
+      - MONGO_FRIEND_PASSWORD=${MONGO_FRIEND_PASSWORD}
     volumes:
       - ./tmp/mongo:/data/db
       - ./scripts/mongo:/docker-entrypoint-initdb.d
