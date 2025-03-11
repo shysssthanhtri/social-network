@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'common-nestjs-server';
 import { SignUpQueue } from 'rabbitmq-config';
 
@@ -15,7 +15,6 @@ import { LoginUseCase } from '@/domain/use-cases/login/login.use-case';
 import { RefreshTokenUseCase } from '@/domain/use-cases/refresh-token/refresh-token.use-case';
 import { SignUpUseCase } from '@/domain/use-cases/sign-up/sign-up.use-case';
 import { UserRepoImpl } from '@/frameworks/repo/user.repo.impl';
-import { UserSchema } from '@/frameworks/schemas/user.schema';
 import { HashPasswordServiceImpl } from '@/frameworks/services/hash-password.service.impl';
 import { SignJwtServiceImpl } from '@/frameworks/services/sign-jwt.service.imp';
 import { JwtStrategy } from '@/frameworks/strategies/jwt.strategy';
@@ -27,17 +26,6 @@ import { AppService } from './app.service';
 @Module({
     imports: [
         CommonModule,
-        MongooseModule.forRootAsync({
-            useFactory: (configService: ConfigService) => {
-                return {
-                    uri: configService.getOrThrow('AUTH_DATABASE_URL'),
-                };
-            },
-            inject: [ConfigService],
-        }),
-        MongooseModule.forFeature([
-            { name: UserEntity.name, schema: UserSchema },
-        ]),
         JwtModule.registerAsync({
             global: true,
             useFactory: (configService: ConfigService) => ({
@@ -62,6 +50,17 @@ import { AppService } from './app.service';
                 inject: [ConfigService],
             },
         ]),
+        TypeOrmModule.forRootAsync({
+            useFactory: (configService: ConfigService) => ({
+                type: 'postgres',
+                url: configService.getOrThrow<string>('AUTH_DATABASE_URL'),
+                entities: [UserEntity],
+                synchronize: true,
+                logging: true,
+            }),
+            inject: [ConfigService],
+        }),
+        TypeOrmModule.forFeature([UserEntity]),
     ],
     controllers: [AppController, AuthController],
     providers: [

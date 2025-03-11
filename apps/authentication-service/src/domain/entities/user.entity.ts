@@ -1,15 +1,21 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
-@Schema({ collection: 'users' })
+@Entity({ name: 'users' })
 export class UserEntity {
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Prop()
+    @Column()
+    @Index()
     email: string;
 
-    @Prop()
+    @Column()
     hashedPassword: string;
 
-    @Prop()
+    @Column({
+        default: 1,
+        comment:
+            'Version of current password. Each time change password need to be increased.',
+    })
     passwordVersion: number;
 }
