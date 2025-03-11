@@ -1,21 +1,11 @@
-import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
+import { CommonNestApp } from 'common-nestjs-server';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, { bufferLogs: true });
+    const app = await CommonNestApp.bootstrap(AppModule);
 
-    const logger = app.get(Logger);
-    app.useLogger(logger);
-    app.useGlobalInterceptors(new LoggerErrorInterceptor());
-
-    const configService = app.get(ConfigService);
-    const port = configService.getOrThrow<string>('API_GATEWAY_PORT');
-    await app.listen(port, () => {
-        logger.log(`Running on port ${port}...`);
-    });
+    await app.listen('API_GATEWAY_PORT');
 }
 bootstrap().catch((err) => {
     console.error(err);

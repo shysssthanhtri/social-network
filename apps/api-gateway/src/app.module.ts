@@ -1,21 +1,28 @@
+import { IntrospectAndCompose } from '@apollo/gateway';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { LoggerModule } from 'nestjs-pino';
+import { GraphQLModule } from '@nestjs/graphql';
+import { CommonModule } from 'common-nestjs-server';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
-        LoggerModule.forRoot({
-            pinoHttp: {
-                name: 'add some name to every JSON line',
-                level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
-                transport:
-                    process.env.NODE_ENV !== 'production'
-                        ? { target: 'pino-pretty' }
-                        : undefined,
+        CommonModule,
+        GraphQLModule.forRoot<ApolloGatewayDriverConfig>({
+            driver: ApolloGatewayDriver,
+            server: {
+                playground: false,
+                plugins: [ApolloServerPluginLandingPageLocalDefault()],
+            },
+            gateway: {
+                supergraphSdl: new IntrospectAndCompose({
+                    subgraphs: [
+                        { name: 'users', url: 'http://localhost:3001/graphql' },
+                    ],
+                }),
             },
         }),
     ],
