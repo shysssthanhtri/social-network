@@ -6,7 +6,7 @@ import {
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'common-nestjs-server';
 
 import { UserEntity } from '@/domain/entities/user.entity';
@@ -14,7 +14,6 @@ import { UserRepo } from '@/domain/repo/user.repo';
 import { AddUserUseCase } from '@/domain/use-cases/add-user/add-user.use-case';
 import { GetUserByIdUseCase } from '@/domain/use-cases/get-user-by-id/get-user-by-id.use-case';
 import { UserRepoImpl } from '@/frameworks/repo/user.repo.impl';
-import { UserSchema } from '@/frameworks/schemas/user.schema';
 import { UsersListener } from '@/gateways/users.listener';
 import { UsersResolver } from '@/gateways/users.resolver';
 
@@ -32,17 +31,17 @@ import { AppService } from './app.service';
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
-        MongooseModule.forRootAsync({
-            useFactory: (configService: ConfigService) => {
-                return {
-                    uri: configService.getOrThrow('USER_DATABASE_URL'),
-                };
-            },
+        TypeOrmModule.forRootAsync({
+            useFactory: (configService: ConfigService) => ({
+                type: 'postgres',
+                url: configService.getOrThrow<string>('USER_DATABASE_URL'),
+                entities: [UserEntity],
+                synchronize: true,
+                logging: true,
+            }),
             inject: [ConfigService],
         }),
-        MongooseModule.forFeature([
-            { name: UserEntity.name, schema: UserSchema },
-        ]),
+        TypeOrmModule.forFeature([UserEntity]),
     ],
     controllers: [AppController, UsersListener],
     providers: [

@@ -2,7 +2,9 @@ import { ConfigService } from '@nestjs/config';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { CommonNestApp } from 'common-nestjs-server';
 import { Logger } from 'nestjs-pino';
+import { TransactionInterceptor } from 'nestjs-postgresql';
 import { SignUpQueue } from 'rabbitmq-config';
+import { DataSource } from 'typeorm';
 
 import { AppModule } from './app.module';
 
@@ -22,6 +24,9 @@ async function bootstrap() {
     server.status.subscribe((status) => {
         logger.log(`RabbitMQ status: ${status}`);
     });
+
+    const dataSource = app.getApp().get(DataSource);
+    app.getApp().useGlobalInterceptors(new TransactionInterceptor(dataSource));
 
     await app.getApp().startAllMicroservices();
     await app.listen('USER_PORT');

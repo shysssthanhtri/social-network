@@ -29,16 +29,18 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/graphql": "^13.0.3",
     "@nestjs/microservices": "^11.0.11",
-    "@nestjs/mongoose": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/typeorm": "^11.0.0",
     "common-nestjs-server": "workspace:^",
     "graphql": "^16.10.0",
-    "mongoose": "^8.11.0",
     "nestjs-pino": "^4.3.1",
+    "nestjs-postgresql": "workspace:^",
+    "pg": "^8.13.3",
     "pino-http": "^10.4.0",
     "rabbitmq-config": "workspace:^",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.21"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

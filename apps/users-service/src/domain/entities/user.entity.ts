@@ -1,14 +1,15 @@
 import { Directive, Field, ID, ObjectType } from '@nestjs/graphql';
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Column, Entity } from 'typeorm';
 
-@Schema({ collection: 'users' })
+@Entity({ name: 'users' })
 @ObjectType()
 @Directive('@key(fields: "id")')
 export class UserEntity {
     @Field(() => ID, { description: "User's id" })
+    @Column({ primary: true })
     id: string;
 
-    @Prop()
+    @Column()
     @Field({ description: "User's email" })
     email: string;
 }

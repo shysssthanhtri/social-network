@@ -1,28 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { DataSource } from 'typeorm';
 
 import { UserEntity } from '@/domain/entities/user.entity';
 import { UserRepo } from '@/domain/repo/user.repo';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UserRepoImpl extends UserRepo {
-    constructor(
-        @InjectModel(UserEntity.name)
-        private readonly userModel: Model<UserEntity>,
-    ) {
-        super();
+    constructor(dataSource: DataSource, @Inject(REQUEST) req: Request) {
+        super(dataSource, req);
     }
 
     async add(user: UserEntity): Promise<UserEntity> {
-        const createdUser = new this.userModel(user);
-        createdUser._id = new Types.ObjectId(user.id);
-        return (await createdUser.save()).toJSON();
+        return this.getRepository(UserEntity).save(user);
     }
 
     async getById(id: UserEntity['id']): Promise<UserEntity> {
-        const user = await this.userModel.findById(id);
-        if (!user) throw new NotFoundException();
+        const user = await this.getRepository(UserEntity).findOne({
+            where: { id },
+        });
+        if (!user) {
+            throw new NotFoundException();
+        }
         return user;
     }
 }

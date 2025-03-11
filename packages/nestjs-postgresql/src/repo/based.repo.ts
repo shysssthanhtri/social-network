@@ -1,6 +1,6 @@
 import { DataSource, EntityManager, ObjectLiteral, Repository } from 'typeorm';
 
-import { ENTITY_MANAGER_KEY } from '@/interceptors';
+import { ENTITY_MANAGER_KEY } from '../interceptors';
 
 export abstract class BasedRepo {
     constructor(
