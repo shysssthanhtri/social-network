@@ -44,9 +44,12 @@ import { AppService } from './app.service';
     providers: [AppService],
 })
 export class AppModule implements NestModule {
+    constructor(private readonly configService: ConfigService) {}
+
     configure(consumer: MiddlewareConsumer) {
-        consumer
-            .apply(AuthProxyMiddleware)
-            .forRoutes({ path: 'auth/*splat', method: RequestMethod.ALL });
+        consumer.apply(AuthProxyMiddleware).forRoutes({
+            path: `${this.configService.getOrThrow('AUTH_PREFIX')}/*splat`,
+            method: RequestMethod.ALL,
+        });
     }
 }

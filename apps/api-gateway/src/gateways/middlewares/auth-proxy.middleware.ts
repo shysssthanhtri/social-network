@@ -1,5 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { json } from 'body-parser';
 import { Request, Response } from 'express';
 import { createProxyMiddleware, RequestHandler } from 'http-proxy-middleware';
 import { Logger } from 'nestjs-pino';
@@ -8,7 +9,12 @@ import { Logger } from 'nestjs-pino';
 export class AuthProxyMiddleware implements NestMiddleware {
     private readonly proxy: RequestHandler;
 
-    constructor(configService: ConfigService, logger: Logger) {
+    private readonly jsonParseMiddleware = json();
+
+    constructor(
+        private readonly configService: ConfigService,
+        logger: Logger,
+    ) {
         this.proxy = createProxyMiddleware<Request, Response>({
             target: configService.getOrThrow<string>('AUTH_URL'),
             pathRewrite: {
@@ -27,6 +33,10 @@ export class AuthProxyMiddleware implements NestMiddleware {
     }
 
     use(req: Request, res: Response, next: () => void) {
-        return this.proxy(req, res, next);
+        if (req.path.startsWith(this.configService.getOrThrow('AUTH_PREFIX'))) {
+            return this.proxy(req, res, next);
+        } else {
+            return this.jsonParseMiddleware(req, res, next);
+        }
     }
 }

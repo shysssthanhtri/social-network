@@ -1,10 +1,15 @@
-import { INestApplication, Options, ValidationPipe } from '@nestjs/common';
+import {
+    INestApplication,
+    NestApplicationOptions,
+    Options,
+    ValidationPipe,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 type Module = Parameters<typeof NestFactory.create>[0];
-type Options = Parameters<typeof NestFactory.create>[1];
+type Options = NestApplicationOptions;
 
 export class CommonNestApp {
     private readonly app: INestApplication;

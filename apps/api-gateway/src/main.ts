@@ -3,7 +3,7 @@ import { CommonNestApp } from 'common-nestjs-server';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-    const app = await CommonNestApp.bootstrap(AppModule);
+    const app = await CommonNestApp.bootstrap(AppModule, { bodyParser: false });
 
     await app.listen('API_GATEWAY_PORT');
 }
