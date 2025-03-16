@@ -4,10 +4,10 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { type Request } from 'express';
 import { catchError, concatMap, finalize, Observable } from 'rxjs';
 import { type DataSource } from 'typeorm';
-
 export const ENTITY_MANAGER_KEY = 'ENTITY_MANAGER';
 
 @Injectable()
@@ -19,13 +19,22 @@ export class TransactionInterceptor implements NestInterceptor {
         next: CallHandler<any>,
     ): Promise<Observable<any>> {
         // get request object
-        const req = context.switchToHttp().getRequest<Request>();
+        const reqRest = context.switchToHttp().getRequest<Request>();
+
+        const ctx = GqlExecutionContext.create(context);
+        const reqGraphql = ctx.getContext<{ req: Request }>().req;
+
         // start transaction
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
         // attach query manager with transaction to the request
-        req[ENTITY_MANAGER_KEY] = queryRunner.manager;
+        if (reqRest) {
+            reqRest[ENTITY_MANAGER_KEY] = queryRunner.manager;
+        }
+        if (reqGraphql) {
+            reqGraphql[ENTITY_MANAGER_KEY] = queryRunner.manager;
+        }
 
         return next.handle().pipe(
             // concatMap gets called when route handler completes successfully
