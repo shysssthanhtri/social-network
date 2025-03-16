@@ -14,6 +14,7 @@ async function bootstrap() {
     const dataSource = app.getApp().get(DataSource);
     app.getApp().useGlobalInterceptors(new TransactionInterceptor(dataSource));
 
+    app.getApp().setGlobalPrefix('/api');
     await app.listen('AUTH_PORT');
 }
 

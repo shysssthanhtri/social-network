@@ -7,12 +7,15 @@ import { LoggerModule } from 'nestjs-pino';
         ConfigModule.forRoot({ isGlobal: true }),
         LoggerModule.forRoot({
             pinoHttp: {
-                name: 'add some name to every JSON line',
                 level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
-                transport:
-                    process.env.NODE_ENV !== 'production'
-                        ? { target: 'pino-pretty' }
-                        : undefined,
+                transport: {
+                    targets: [
+                        {
+                            level: 'debug',
+                            target: 'pino-pretty',
+                        },
+                    ],
+                },
             },
         }),
     ],

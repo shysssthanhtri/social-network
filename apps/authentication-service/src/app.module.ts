@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -51,13 +51,43 @@ import { AppService } from './app.service';
             },
         ]),
         TypeOrmModule.forRootAsync({
-            useFactory: (configService: ConfigService) => ({
-                type: 'postgres',
-                url: configService.getOrThrow<string>('AUTH_DATABASE_URL'),
-                entities: [UserEntity],
-                synchronize: true,
-                logging: true,
-            }),
+            useFactory: (configService: ConfigService) => {
+                const logger = new Logger('Typeorm');
+                return {
+                    type: 'postgres',
+                    url: configService.getOrThrow<string>('AUTH_DATABASE_URL'),
+                    entities: [UserEntity],
+                    synchronize: true,
+                    logging: true,
+                    logger: {
+                        logQuery(query) {
+                            logger.debug(query);
+                        },
+                        logQueryError(error, query) {
+                            logger.error(error);
+                            logger.debug(query);
+                        },
+                        logQuerySlow(time, query) {
+                            logger.warn(time);
+                            logger.debug(query);
+                        },
+                        logSchemaBuild(message) {
+                            logger.log(message);
+                        },
+                        logMigration(message) {
+                            logger.log(message);
+                        },
+                        log(level, message) {
+                            if (level === 'info' || level === 'log') {
+                                logger.log(message);
+                            }
+                            if (level === 'warn') {
+                                logger.warn(message);
+                            }
+                        },
+                    },
+                };
+            },
             inject: [ConfigService],
         }),
         TypeOrmModule.forFeature([UserEntity]),
