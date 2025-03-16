@@ -1,9 +1,9 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'common-nestjs-server';
+import { CommonTypeOrmModule } from 'nestjs-postgresql';
 import { SignUpQueue } from 'rabbitmq-config';
 
 import { UserEntity } from '@/domain/entities/user.entity';
@@ -50,47 +50,10 @@ import { AppService } from './app.service';
                 inject: [ConfigService],
             },
         ]),
-        TypeOrmModule.forRootAsync({
-            useFactory: (configService: ConfigService) => {
-                const logger = new Logger('Typeorm');
-                return {
-                    type: 'postgres',
-                    url: configService.getOrThrow<string>('AUTH_DATABASE_URL'),
-                    entities: [UserEntity],
-                    synchronize: true,
-                    logging: true,
-                    logger: {
-                        logQuery(query) {
-                            logger.debug(query);
-                        },
-                        logQueryError(error, query) {
-                            logger.error(error);
-                            logger.debug(query);
-                        },
-                        logQuerySlow(time, query) {
-                            logger.warn(time);
-                            logger.debug(query);
-                        },
-                        logSchemaBuild(message) {
-                            logger.log(message);
-                        },
-                        logMigration(message) {
-                            logger.log(message);
-                        },
-                        log(level, message) {
-                            if (level === 'info' || level === 'log') {
-                                logger.log(message);
-                            }
-                            if (level === 'warn') {
-                                logger.warn(message);
-                            }
-                        },
-                    },
-                };
-            },
-            inject: [ConfigService],
+        CommonTypeOrmModule.forRootAsync({
+            entities: [UserEntity],
+            urlKey: 'AUTH_DATABASE_URL',
         }),
-        TypeOrmModule.forFeature([UserEntity]),
     ],
     controllers: [AppController, AuthController],
     providers: [
