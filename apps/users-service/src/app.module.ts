@@ -4,10 +4,9 @@ import {
     ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'common-nestjs-server';
+import { CommonTypeOrmModule } from 'nestjs-postgresql';
 
 import { UserEntity } from '@/domain/entities/user.entity';
 import { UserRepo } from '@/domain/repo/user.repo';
@@ -31,17 +30,10 @@ import { AppService } from './app.service';
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
-        TypeOrmModule.forRootAsync({
-            useFactory: (configService: ConfigService) => ({
-                type: 'postgres',
-                url: configService.getOrThrow<string>('USER_DATABASE_URL'),
-                entities: [UserEntity],
-                synchronize: true,
-                logging: true,
-            }),
-            inject: [ConfigService],
+        CommonTypeOrmModule.forRootAsync({
+            entities: [UserEntity],
+            urlKey: 'USER_DATABASE_URL',
         }),
-        TypeOrmModule.forFeature([UserEntity]),
     ],
     controllers: [AppController, UsersListener],
     providers: [
