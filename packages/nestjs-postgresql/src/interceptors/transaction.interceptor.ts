@@ -4,7 +4,7 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
+import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { type Request } from 'express';
 import { catchError, concatMap, finalize, Observable } from 'rxjs';
 import { type DataSource } from 'typeorm';
@@ -18,21 +18,19 @@ export class TransactionInterceptor implements NestInterceptor {
         context: ExecutionContext,
         next: CallHandler<any>,
     ): Promise<Observable<any>> {
-        // get request object
-        const reqRest = context.switchToHttp().getRequest<Request>();
-
-        const ctx = GqlExecutionContext.create(context);
-        const reqGraphql = ctx.getContext<{ req: Request }>().req;
-
         // start transaction
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
-        // attach query manager with transaction to the request
-        if (reqRest) {
+
+        if (context.getType() === 'http') {
+            // do something that is only important in the context of regular HTTP requests (REST)
+            const reqRest = context.switchToHttp().getRequest<Request>();
             reqRest[ENTITY_MANAGER_KEY] = queryRunner.manager;
-        }
-        if (reqGraphql) {
+        } else if (context.getType<GqlContextType>() === 'graphql') {
+            // do something that is only important in the context of GraphQL requests
+            const ctx = GqlExecutionContext.create(context);
+            const reqGraphql = ctx.getContext<{ req: Request }>().req;
             reqGraphql[ENTITY_MANAGER_KEY] = queryRunner.manager;
         }
 
