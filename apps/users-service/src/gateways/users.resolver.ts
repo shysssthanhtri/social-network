@@ -17,6 +17,7 @@ export class UsersResolver {
         __typename: string;
         id: UserEntity['id'];
     }): Promise<UserEntity> {
+        console.log(reference);
         return this.getUserByIdUseCase.execute(reference.id);
     }
 }

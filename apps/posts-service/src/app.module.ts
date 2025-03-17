@@ -11,8 +11,11 @@ import { CommonTypeOrmModule } from 'nestjs-postgresql';
 import { PostEntity } from '@/domain/entities/post.entity';
 import { PostRepo } from '@/domain/repo/post.repo';
 import { CreatePostUseCase } from '@/domain/use-cases/create-post/create-post.use-case';
+import { GetPostsUseCase } from '@/domain/use-cases/get-posts/get-posts.use-case';
 import { PostRepoImpl } from '@/framework/repo/post.repo.impl';
 import { PostMutation } from '@/gateway/mutations/post.mutation';
+import { PostsResolver } from '@/gateway/resolvers/post.resolver';
+import { UserResolver } from '@/gateway/resolvers/user.resolver';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -39,9 +42,14 @@ import { AppService } from './app.service';
 
         //  USE CASES
         CreatePostUseCase,
+        GetPostsUseCase,
 
         //  MUTATIONS
         PostMutation,
+
+        //  RESOLVERS
+        UserResolver,
+        PostsResolver,
 
         //  REPO
         { provide: PostRepo, useClass: PostRepoImpl },

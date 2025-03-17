@@ -17,4 +17,8 @@ export class PostRepoImpl extends PostRepo {
     create(post: Omit<PostEntity, 'id'>): Promise<PostEntity> {
         return this.getRepository(PostEntity).save(post);
     }
+
+    getByAuthorId(authorId: PostEntity['authorId']): Promise<PostEntity[]> {
+        return this.getRepository(PostEntity).find({ where: { authorId } });
+    }
 }

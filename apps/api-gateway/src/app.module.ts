@@ -33,6 +33,10 @@ import { AppService } from './app.service';
                                 name: 'users',
                                 url: `${configService.getOrThrow<string>('USERS_URL')}/graphql`,
                             },
+                            {
+                                name: 'posts',
+                                url: `${configService.getOrThrow<string>('POSTS_URL')}/graphql`,
+                            },
                         ],
                     }),
                 },
@@ -44,11 +48,9 @@ import { AppService } from './app.service';
     providers: [AppService],
 })
 export class AppModule implements NestModule {
-    constructor(private readonly configService: ConfigService) {}
-
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(AuthProxyMiddleware).forRoutes({
-            path: `${this.configService.getOrThrow('AUTH_PREFIX')}/*splat`,
+            path: `/*splat`,
             method: RequestMethod.ALL,
         });
     }
