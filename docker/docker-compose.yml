@@ -47,3 +47,18 @@ services:
     volumes:
         - ./tmp/rabbitmq/data/:/var/lib/rabbitmq
         - ./tmp/rabbitmq/log/:/var/log/rabbitmq
+
+  authentication-service:
+    container_name: authentication-service
+    image: authentication-service
+    depends_on:
+      - postgresql
+      - rabbitmq
+    ports:
+      - 3000:3000
+    environment:
+      - AUTH_PORT=${AUTH_PORT}
+      - AUTH_DATABASE_URL=${AUTH_DATABASE_URL}
+      - AUTH_ACCESS_TOKEN_SECRET=${AUTH_ACCESS_TOKEN_SECRET}
+      - AUTH_ACCESS_REFRESH_SECRET=${AUTH_ACCESS_REFRESH_SECRET}
+      - RABBITMQ_URL=${RABBITMQ_URL}
